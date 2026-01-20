@@ -21,11 +21,11 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 0; /* Intro-এর জন্য padding 0 করা হলো, মেইন কন্টেন্টে দেওয়া হবে */
+            padding: 0;
             overflow: hidden; /* Intro চলাকালীন স্ক্রল বন্ধ */
         }
 
-        /* --- INTRO ANIMATION STYLES --- */
+        /* --- INTRO ANIMATION STYLES (UPDATED) --- */
         #intro-overlay {
             position: fixed;
             top: 0;
@@ -39,63 +39,51 @@
             justify-content: center;
             align-items: center;
             transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1);
+            cursor: pointer;
         }
 
         .intro-text {
             font-family: 'Playfair Display', serif;
             font-size: 32px;
-            color: transparent;
             background: linear-gradient(90deg, #fff, #8b5cf6, #ec4899);
             -webkit-background-clip: text;
             background-clip: text;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: textReveal 1.2s ease forwards 0.5s;
-            letter-spacing: 2px;
-            text-align: center;
+            color: transparent;
+            margin-bottom: 10px;
+            animation: fadeIn 1s ease forwards;
         }
 
         .intro-sub {
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
+            font-size: 10px;
             color: #64748b;
-            margin-top: 10px;
-            opacity: 0;
-            animation: fadeSub 1s ease forwards 1s;
             letter-spacing: 3px;
             text-transform: uppercase;
+            animation: fadeIn 1.5s ease forwards;
         }
 
-        .loader-line {
-            width: 0;
-            height: 2px;
-            background: var(--accent);
-            margin-top: 30px;
-            border-radius: 2px;
-            animation: loadLine 2s ease forwards;
+        .tap-hint {
+            margin-top: 50px;
+            font-size: 10px;
+            color: #444;
+            border: 1px solid #333;
+            padding: 5px 15px;
+            border-radius: 20px;
+            animation: pulse 2s infinite;
         }
 
-        @keyframes textReveal {
-            to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes fadeSub {
-            to { opacity: 1; }
-        }
-        @keyframes loadLine {
-            0% { width: 0; }
-            50% { width: 100px; }
-            100% { width: 200px; opacity: 0; }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
 
-        /* --- MAIN DASHBOARD STYLES --- */
+        /* --- MAIN LAYOUT --- */
         .dashboard-wrapper {
             width: 100%;
             display: flex;
             justify-content: center;
-            padding: 20px;
+            padding: 15px;
             min-height: 100vh;
-            opacity: 0; /* শুরুতে লুকানো */
+            opacity: 0;
             transition: opacity 1s ease;
+            box-sizing: border-box;
         }
 
         .dashboard {
@@ -107,41 +95,50 @@
             padding-bottom: 20px;
         }
 
-        /* ... (বাকি আগের স্টাইলগুলো অপরিবর্তিত) ... */
+        /* --- UI COMPONENTS --- */
         .nav-tabs { display: flex; background: var(--card-bg); padding: 5px; border-radius: 12px; gap: 5px; border: 1px solid #334155; }
-        .tab-btn { flex: 1; padding: 10px 5px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 11px; cursor: pointer; border-radius: 8px; transition: 0.3s; }
-        .tab-btn.active { background: var(--accent); color: white; box-shadow: 0 2px 10px rgba(139, 92, 246, 0.4); }
-        .view-section { display: none; animation: fadeIn 0.3s ease; }
+        .tab-btn { flex: 1; padding: 10px; border: none; background: transparent; color: var(--text-muted); font-weight: 600; font-size: 11px; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        .tab-btn.active { background: var(--accent); color: white; }
+
+        .view-section { display: none; animation: fadeIn 0.4s ease; }
         .view-section.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .card { background-color: var(--card-bg); border: 1px solid #334155; border-radius: 16px; padding: 15px; margin-bottom: 12px; }
-        .card-title { font-size: 11px; color: #64748b; margin-bottom: 10px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
-        .contrast-box { padding: 15px; border-radius: 8px; text-align: center; font-weight: 600; margin-bottom: 10px; transition: background 0.2s; }
-        .value-row { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #334155; cursor: pointer; }
-        .palette-row { display: flex; height: 35px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
-        .p-box { flex: 1; transition: background 0.3s; }
-        .makeup-area { position: relative; width: 100%; height: 260px; border-radius: 16px; overflow: hidden; border: 2px solid #333; background-color: var(--skin-tone); background-image: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.2) 100%); }
+        .card-title { font-size: 11px; color: #64748b; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
+
+        .makeup-area { position: relative; width: 100%; height: 260px; border-radius: 16px; overflow: hidden; border: 2px solid #333; background-color: var(--skin-tone); }
         .face-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
         .makeup-mask { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; mix-blend-mode: multiply; opacity: 0.6; filter: blur(4px); pointer-events: none; transition: fill 0.2s; }
-        .shade-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 5px; }
-        .shade-btn { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: transform 0.2s; }
-        .shade-btn:hover { transform: scale(1.1); border-color: #fff; }
-        .sliders { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+
+        /* Grid */
+        .shade-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 5px; }
+        .shade-btn { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
+        
+        /* Others */
+        .sliders { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
         .slider-group { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; }
-        input[type=range] { width: 60%; accent-color: var(--accent); cursor: pointer; }
-        #imageCanvas { width: 100%; border-radius: 8px; cursor: crosshair; display: none; margin-top: 10px; border: 1px solid #334155;}
-        .upload-area { border: 2px dashed #334155; padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; color: #64748b; font-size: 12px; }
+        input[type=range] { width: 60%; accent-color: var(--accent); }
+        
+        .contrast-box { padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
+        .value-row { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #ccc; margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #334155; }
+        .palette-row { display: flex; height: 35px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
+        .p-box { flex: 1; transition: background 0.3s; }
+
         .wheel-container { background: var(--card-bg); padding: 20px; border-radius: 20px; text-align: center; margin-top: auto; border: 1px solid #334155; display: flex; justify-content: center; }
-        #picker { display: block; }
+        
+        /* Image Picker */
+        #imageCanvas { width: 100%; display: none; margin-top: 10px; border-radius: 8px; }
+        .upload-area { border: 2px dashed #444; padding: 20px; text-align: center; font-size: 12px; color: #888; border-radius: 8px; }
+
         footer { text-align: center; font-size: 10px; color: #475569; margin-top: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="intro-overlay">
+    <div id="intro-overlay" onclick="closeIntro()">
         <div class="intro-text">Ultimate Color Studio</div>
-        <div class="intro-sub">Designed by Yeasin Kabir</div>
-        <div class="loader-line"></div>
+        <div class="intro-sub">DESIGNED BY YEASIN KABIR</div>
+        <div class="tap-hint">Tap to Start</div>
     </div>
 
     <div class="dashboard-wrapper">
@@ -159,14 +156,12 @@
                     <div id="contrastBox" class="contrast-box" style="color: white; background: #8b5cf6;">Preview Text</div>
                     <div style="text-align:center; font-size:11px; color:#4ade80;" id="contrastBadge">Good with White Text</div>
                 </div>
-
                 <div class="card">
                     <div class="card-title">Color Codes</div>
                     <div class="value-row" onclick="copyText('hexValue')"><span id="hexValue">#8b5cf6</span> <span>HEX</span></div>
                     <div class="value-row" onclick="copyText('rgbValue')"><span id="rgbValue">rgb(139, 92, 246)</span> <span>RGB</span></div>
                     <div class="value-row"><span id="colorNameWeb">Loading...</span> <span>NAME</span></div>
                 </div>
-
                 <div class="card">
                     <div class="card-title">Auto Palettes</div>
                     <div class="palette-row">
@@ -184,7 +179,6 @@
                         <path d="M25,65 C60,80 100,85 100,85 C100,85 140,80 175,65 C160,110 100,115 100,115 C100,115 40,110 25,65 Z" fill="#8b5cf6" />
                     </svg>
                 </div>
-
                 <div class="card">
                     <div class="card-title">🔥 Trending Shades</div>
                     <div class="shade-grid">
@@ -196,7 +190,6 @@
                         <div class="shade-btn" style="background:#ec4899" onclick="setShade('#ec4899')"></div>
                     </div>
                 </div>
-
                 <div class="card">
                     <div class="card-title">Adjustments</div>
                     <div class="sliders">
@@ -226,55 +219,57 @@
     </div>
 
     <script>
+        // --- SAFE JS LOADING ---
         window.addEventListener('DOMContentLoaded', () => {
             
-            // --- 0. INTRO ANIMATION ---
-            setTimeout(() => {
-                const intro = document.getElementById('intro-overlay');
-                const dashboard = document.querySelector('.dashboard-wrapper');
-                const body = document.body;
+            // INTRO LOGIC (Safe)
+            const intro = document.getElementById('intro-overlay');
+            const dashboard = document.querySelector('.dashboard-wrapper');
+            const body = document.body;
 
-                // Slide up intro
+            window.closeIntro = function() {
                 intro.style.transform = 'translateY(-100%)';
-                
-                // Show dashboard
                 dashboard.style.opacity = '1';
-                body.style.overflow = 'auto'; // Enable scroll
-            }, 2500); // 2.5 seconds delay
+                body.style.overflow = 'auto';
+            };
 
-            // --- 1. SETUP COLOR PICKER ---
+            // Auto close after 2.5s
+            setTimeout(window.closeIntro, 2500);
+
+            // SETUP COLOR PICKER
             let colorPicker;
             try {
                 colorPicker = new iro.ColorPicker("#picker", {
                     width: 250, color: "#8b5cf6", borderWidth: 2, borderColor: "#fff",
                     layout: [{ component: iro.ui.Wheel }, { component: iro.ui.Slider, options: { sliderType: 'value' } }]
                 });
-            } catch (error) { document.getElementById('picker').innerHTML = "Wheel Error. Check Net."; }
+            } catch (error) { 
+                document.getElementById('picker').innerHTML = "Wheel Error. Check Internet."; 
+            }
 
-            // --- 2. MAIN LOGIC ---
+            // APP LOGIC
             window.switchTab = function(tabId, btn) {
                 document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
                 document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
                 document.getElementById(tabId + '-view').classList.add('active');
                 if(btn) btn.classList.add('active');
-            }
+            };
 
             window.setShade = function(hex) {
                 if(colorPicker) colorPicker.color.hexString = hex;
-            }
+            };
 
-            // EVENT LISTENER
+            // Event Listeners
             if (colorPicker) {
                 colorPicker.on('color:change', function(color) {
                     const hex = color.hexString;
                     const hsl = color.hsl;
 
-                    // WEB VIEW
+                    // WEB
                     document.getElementById('hexValue').textContent = hex;
                     document.getElementById('rgbValue').textContent = color.rgbString;
-                    
-                    const lum = (0.299 * color.rgb.r + 0.587 * color.rgb.g + 0.114 * color.rgb.b) / 255;
                     const cBox = document.getElementById('contrastBox');
+                    const lum = (0.299 * color.rgb.r + 0.587 * color.rgb.g + 0.114 * color.rgb.b) / 255;
                     cBox.style.backgroundColor = hex;
                     cBox.style.color = lum > 0.5 ? '#000' : '#fff';
                     document.getElementById('contrastBadge').textContent = lum > 0.5 ? 'Dark Text Better' : 'White Text Better';
@@ -284,21 +279,69 @@
                         document.getElementById('p-comp').style.backgroundColor = `hsl(${(hsl.h + 180)%360}, ${hsl.s}%, ${hsl.l}%)`;
                     }
 
-                    // BEAUTY VIEW
+                    // BEAUTY
                     document.querySelectorAll('.makeup-mask path').forEach(p => p.setAttribute('fill', hex));
 
-                    // FETCH NAME
                     fetchColorName(hex);
                 });
             }
 
-            // UTILS
+            // Sliders
             const maskEl = document.getElementById('makeupMask');
             document.getElementById('opacitySlider').addEventListener('input', function() { maskEl.style.opacity = this.value; });
             document.getElementById('blurSlider').addEventListener('input', function() { maskEl.style.filter = `blur(${this.value}px)`; });
 
+            // Images
             document.getElementById('beautyUpload').addEventListener('change', function(e) {
                 if(e.target.files[0]) document.getElementById('faceImage').src = URL.createObjectURL(e.target.files[0]);
             });
 
-            const canvas = document.getElementById('
+            const canvas = document.getElementById('imageCanvas');
+            const ctx = canvas.getContext('2d');
+            document.getElementById('imgPickerInput').addEventListener('change', function(e) {
+                if(e.target.files[0]) {
+                    const img = new Image();
+                    img.onload = function() {
+                        canvas.style.display = 'block';
+                        document.getElementById('uploadText').style.display = 'none';
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                    }
+                    img.src = URL.createObjectURL(e.target.files[0]);
+                }
+            });
+
+            canvas.addEventListener('click', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                const p = ctx.getImageData(x, y, 1, 1).data;
+                const hex = "#" + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
+                if(colorPicker) colorPicker.color.hexString = hex;
+            });
+
+            let timeout;
+            function fetchColorName(hex) {
+                clearTimeout(timeout);
+                const nameEl = document.getElementById('colorNameWeb');
+                if(nameEl) nameEl.textContent = "...";
+                timeout = setTimeout(async()=>{
+                    try {
+                        const res = await fetch(`https://www.thecolorapi.com/id?hex=${hex.substring(1)}`);
+                        const data = await res.json();
+                        if(nameEl) nameEl.textContent = data.name.value;
+                    } catch(e) {}
+                }, 500);
+            }
+
+            window.copyText = function(id) {
+                navigator.clipboard.writeText(document.getElementById(id).innerText);
+                alert("Copied!");
+            };
+        });
+    </script>
+</body>
+</html>
