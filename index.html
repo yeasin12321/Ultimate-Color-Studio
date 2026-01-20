@@ -3,16 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Real Glamour Studio</title>
+    <title>Realistic Lip Shade Tester</title>
     <script src="https://cdn.jsdelivr.net/npm/@jaames/iro@5"></script>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Lato:wght@300;400&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-dark: #050505;
-            --panel-bg: #1a1014;
+            --bg-dark: #121212; /* সাইটের মূল ব্যাকগ্রাউন্ড */
+            --panel-bg: #1e1e1e;
             --gold: #d4af37;
             --pink: #ec4899;
             --text-main: #fff0f5;
+            --skin-tone: #d2a38e; /* চামড়ার রঙের ব্যাকগ্রাউন্ড */
         }
 
         body {
@@ -28,127 +29,118 @@
 
         .studio-container {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
             padding: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 20px;
         }
 
         .header { text-align: center; }
         .header h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin: 0; font-size: 26px; }
-        .header p { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 2px; }
+        .header p { font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 2px; }
 
-        /* --- REALISTIC MAKEUP AREA --- */
+        /* --- MAIN AREA (LIPS ON SKIN BACKGROUND) --- */
         .makeup-area {
             position: relative;
             width: 100%;
-            height: 320px; /* Height increased for better view */
-            border-radius: 15px;
+            height: 250px;
+            border-radius: 20px;
             overflow: hidden;
-            border: 1px solid #333;
-            /* Fallback color (Skin Tone) - ছবি লোড না হলে এটা দেখাবে */
-            background-color: #e0ac69; 
+            border: 2px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            
+            /* এই অংশটি চামড়ার রঙের ব্যাকগ্রাউন্ড সেট করছে */
+            background-color: var(--skin-tone); 
+            /* একটু বাস্তব ভাব আনার জন্য হালকা গ্র্যাডিয়েন্ট */
+            background-image: radial-gradient(circle at center, #e0ac69 0%, #c7947b 100%);
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* 1. MODEL IMAGE (Updated Reliable Link) */
-        .model-image {
+        /* 1. REAL LIPS IMAGE CONTAINER */
+        .lips-container {
+            position: relative;
+            width: 220px; /* ঠোঁটের ছবির সাইজ */
+            height: 130px;
+        }
+
+        /* আসল ঠোঁটের ছবি (Close-up) */
+        .real-lips-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            /* খুব জনপ্রিয় এবং দ্রুত লোড হওয়া একটি ছবি */
-            background-image: url('https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80');
+            border-radius: 10px;
+            /* একটি ভালো ক্লোজ-আপ ছবি যা ব্যাকগ্রাউন্ডের সাথে মিশে যায় */
+            background-image: url('https://images.unsplash.com/photo-1531761535209-180857e963b9?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80');
             background-position: center;
-            background-size: cover;
-            transition: background-image 0.3s ease;
+            background-size: 110%;
+            /* ছবিটিকে ব্যাকগ্রাউন্ডের সাথে মেশানোর জন্য মাস্কিং */
+            mask-image: radial-gradient(ellipse at center, black 40%, transparent 70%);
+            -webkit-mask-image: radial-gradient(ellipse at center, black 40%, transparent 70%);
         }
 
-        /* 2. SOFT LIPSTICK MASK */
+        /* 2. COLOR LAYER (SVG Mask) */
         .lipstick-svg {
             position: absolute;
-            top: 55%; /* Adjusted position for this specific face */
+            top: 50%;
             left: 50%;
-            transform: translate(-50%, -50%) scale(1.0);
-            width: 160px; 
-            height: auto;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 100%;
             
-            /* REALISM */
-            mix-blend-mode: multiply; 
-            opacity: 0.6; 
-            filter: blur(5px); /* Soft edges */
+            /* --- REALISM MAGIC --- */
+            mix-blend-mode: multiply; /* কালার চামড়ার সাথে মিশিয়ে দেয় */
+            opacity: 0.6; /* ডিফল্ট ইনটেনসিটি */
+            filter: blur(4px); /* সফট এজ, যাতে কার্টুন মনে না হয় */
             
             pointer-events: none;
             transition: fill 0.2s ease;
         }
 
-        /* --- CONTROLS --- */
+        /* --- CONTROLS SECTION --- */
         .controls {
             background: var(--panel-bg);
             padding: 20px;
             border-radius: 20px;
             text-align: center;
-            border: 1px solid rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--pink); display: block; }
-        .shade-name { font-size: 11px; color: #ccc; text-transform: uppercase; }
+        .brand-info span { display: block; }
+        .brand-name { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--pink); margin-bottom: 5px; }
+        .shade-name { font-size: 12px; color: #ccc; text-transform: uppercase; letter-spacing: 1px; }
 
-        /* Upload Button */
-        .btn-upload {
-            background: transparent;
-            border: 1px solid var(--gold);
-            color: var(--gold);
-            padding: 6px 12px;
-            font-size: 11px;
-            cursor: pointer;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            transition: 0.3s;
-        }
-        .btn-upload:hover { background: var(--gold); color: #000; }
-        input[type="file"] { display: none; }
+        #picker { display: flex; justify-content: center; margin: 20px 0; }
 
-        /* Sliders */
-        .sliders {
-            margin-top: 15px;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .slider-group {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #bbb;
-        }
-        input[type=range] { width: 60%; accent-color: var(--pink); cursor: pointer;}
-
-        #picker { display: flex; justify-content: center; margin-top: 10px; }
+        .sliders { display: flex; flex-direction: column; gap: 10px; }
+        .slider-group { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; }
+        input[type=range] { width: 65%; accent-color: var(--gold); cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="studio-container">
         <div class="header">
-            <h1>Glamour Real</h1>
-            <p>Realistic Lip Shade Tester</p>
+            <h1>Shade Tester</h1>
+            <p>Realistic Isolated Lips</p>
         </div>
 
         <div class="makeup-area">
-            <div class="model-image" id="modelImage"></div>
-            
-            <svg id="lipMask" class="lipstick-svg" viewBox="0 0 200 130" xmlns="http://www.w3.org/2000/svg">
-                <path d="M20,60 C50,40 100,45 100,55 C100,45 150,40 180,60 C150,75 100,85 100,85 C100,85 50,75 20,60 Z" fill="#be002f" />
-                <path d="M25,65 C60,80 100,85 100,85 C100,85 140,80 175,65 C160,110 100,115 100,115 C100,115 40,110 25,65 Z" fill="#be002f" />
-            </svg>
+            <div class="lips-container">
+                <div class="real-lips-img"></div>
+                
+                <svg id="lipMask" class="lipstick-svg" viewBox="0 0 200 120">
+                    <path d="M20,55 C60,35 100,40 100,50 C100,40 140,35 180,55 C150,70 100,75 100,75 C100,75 50,70 20,55 Z" fill="#be002f" />
+                    <path d="M25,60 C60,75 100,80 100,80 C100,80 140,75 175,60 C160,105 100,110 100,110 C100,110 40,105 25,60 Z" fill="#be002f" />
+                </svg>
+            </div>
         </div>
 
         <div class="controls">
-            <button class="btn-upload" onclick="document.getElementById('fileInput').click()">📷 Change Model / Upload Photo</button>
-            <input type="file" id="fileInput" accept="image/*">
-
-            <div style="margin-top: 10px;">
+            <div class="brand-info">
                 <span class="brand-name" id="brandName">MAC</span>
                 <span class="shade-name" id="shadeName">Ruby Woo</span>
             </div>
@@ -156,21 +148,13 @@
             <div id="picker"></div>
             
             <div class="sliders">
-                <div class="slider-group">
-                    <span>Intensity</span>
-                    <input type="range" id="opacitySlider" min="0.1" max="1" step="0.05" value="0.6">
-                </div>
-                <div class="slider-group">
-                    <span>Softness</span>
-                    <input type="range" id="blurSlider" min="0" max="10" step="0.5" value="5">
-                </div>
-                <div class="slider-group">
-                    <span>Move Up/Down</span>
-                    <input type="range" id="moveSlider" min="10" max="90" step="1" value="55">
-                </div>
                  <div class="slider-group">
-                    <span>Size</span>
-                    <input type="range" id="scaleSlider" min="0.5" max="2.0" step="0.1" value="1.0">
+                    <span>Intensity</span>
+                    <input type="range" id="opacitySlider" min="0.2" max="1" step="0.05" value="0.6">
+                </div>
+                <div class="slider-group">
+                    <span>Softness (Blur)</span>
+                    <input type="range" id="blurSlider" min="1" max="8" step="0.5" value="4">
                 </div>
             </div>
         </div>
@@ -188,7 +172,7 @@
             { name: "Heroine", brand: "MAC", hex: "#5e2069" }
         ];
 
-        // Init
+        // Init Picker
         var colorPicker = new iro.ColorPicker("#picker", {
             width: 200, color: "#be002f", borderWidth: 2, borderColor: "#fff",
             layout: [{ component: iro.ui.Wheel }, { component: iro.ui.Slider, options: { sliderType: 'value' } }]
@@ -199,15 +183,7 @@
         const paths = lipMask.querySelectorAll('path');
         const brandDisplay = document.getElementById('brandName');
         const shadeDisplay = document.getElementById('shadeName');
-        const fileInput = document.getElementById('fileInput');
-        const modelImage = document.getElementById('modelImage');
         
-        // Sliders
-        const opacitySlider = document.getElementById('opacitySlider');
-        const blurSlider = document.getElementById('blurSlider');
-        const moveSlider = document.getElementById('moveSlider');
-        const scaleSlider = document.getElementById('scaleSlider');
-
         // Helpers
         function findMatch(hex) {
             let closest = makeupDB[0], minDiff = Infinity;
@@ -228,28 +204,8 @@
             shadeDisplay.textContent = match.name;
         });
 
-        opacitySlider.addEventListener('input', function() { lipMask.style.opacity = this.value; });
-        blurSlider.addEventListener('input', function() { lipMask.style.filter = `blur(${this.value}px)`; });
-        
-        // Adjust Position Logic
-        moveSlider.addEventListener('input', function() { 
-            lipMask.style.top = this.value + "%"; 
-        });
-        scaleSlider.addEventListener('input', function() { 
-            lipMask.style.transform = `translate(-50%, -50%) scale(${this.value})`; 
-        });
-
-        // Upload Logic
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    modelImage.style.backgroundImage = `url(${e.target.result})`;
-                }
-                reader.readAsDataURL(file);
-            }
-        });
+        document.getElementById('opacitySlider').addEventListener('input', function() { lipMask.style.opacity = this.value; });
+        document.getElementById('blurSlider').addEventListener('input', function() { lipMask.style.filter = `blur(${this.value}px)`; });
 
     </script>
 </body>
