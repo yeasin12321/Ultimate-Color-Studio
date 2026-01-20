@@ -76,7 +76,13 @@
         }
         .card-title { font-size: 11px; color: #64748b; margin-bottom: 10px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; }
 
-        /* --- BEAUTY STYLES --- */
+        /* Web Design Elements */
+        .contrast-box { padding: 15px; border-radius: 8px; text-align: center; font-weight: 600; margin-bottom: 10px; transition: background 0.2s; }
+        .value-row { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #334155; cursor: pointer; }
+        .palette-row { display: flex; height: 35px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
+        .p-box { flex: 1; transition: background 0.3s; }
+
+        /* Beauty Elements */
         .makeup-area {
             position: relative; width: 100%; height: 260px; border-radius: 16px; overflow: hidden; border: 2px solid #333;
             background-color: var(--skin-tone);
@@ -87,36 +93,16 @@
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 100%; height: 100%; mix-blend-mode: multiply; opacity: 0.6; filter: blur(4px); pointer-events: none; transition: fill 0.2s;
         }
-
-        /* --- NEW: SWATCH GRID (LIPSTICK SHADES) --- */
-        .shade-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 10px;
-            margin-top: 5px;
-        }
-        .shade-btn {
-            width: 100%;
-            aspect-ratio: 1;
-            border-radius: 50%;
-            border: 2px solid rgba(255,255,255,0.2);
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
+        
+        /* Shade Grid */
+        .shade-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 10px; margin-top: 5px; }
+        .shade-btn { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: transform 0.2s; }
         .shade-btn:hover { transform: scale(1.1); border-color: #fff; }
-        .shade-btn:active { transform: scale(0.9); }
 
         /* Sliders */
         .sliders { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
         .slider-group { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; }
         input[type=range] { width: 60%; accent-color: var(--accent); cursor: pointer; }
-
-        /* Web Design Elements */
-        .contrast-box { padding: 15px; border-radius: 8px; text-align: center; font-weight: 600; margin-bottom: 10px; transition: background 0.2s; }
-        .value-row { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: var(--text-muted); margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #334155; cursor: pointer; }
-        .palette-row { display: flex; height: 35px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
-        .p-box { flex: 1; transition: background 0.3s; }
-        .gradient-preview { height: 60px; border-radius: 8px; margin-top: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: rgba(255,255,255,0.8); }
 
         /* Image Picker */
         #imageCanvas { width: 100%; border-radius: 8px; cursor: crosshair; display: none; margin-top: 10px; border: 1px solid #334155;}
@@ -150,6 +136,7 @@
                 <div class="card-title">Color Codes</div>
                 <div class="value-row" onclick="copyText('hexValue')"><span id="hexValue">#8b5cf6</span> <span>HEX</span></div>
                 <div class="value-row" onclick="copyText('rgbValue')"><span id="rgbValue">rgb(139, 92, 246)</span> <span>RGB</span></div>
+                <div class="value-row"><span id="colorNameWeb">Loading...</span> <span>NAME</span></div>
             </div>
 
             <div class="card">
@@ -236,45 +223,44 @@
                 if(btn) btn.classList.add('active');
             }
 
-            // NEW: Function to set shade from grid
             window.setShade = function(hex) {
                 if(colorPicker) colorPicker.color.hexString = hex;
             }
 
-            // Event Listener for Wheel
+            // EVENT LISTENER
             if (colorPicker) {
                 colorPicker.on('color:change', function(color) {
                     const hex = color.hexString;
                     const hsl = color.hsl;
 
-                    // Update Texts
+                    // WEB VIEW
                     document.getElementById('hexValue').textContent = hex;
                     document.getElementById('rgbValue').textContent = color.rgbString;
                     
-                    // Contrast
                     const lum = (0.299 * color.rgb.r + 0.587 * color.rgb.g + 0.114 * color.rgb.b) / 255;
                     const cBox = document.getElementById('contrastBox');
                     cBox.style.backgroundColor = hex;
                     cBox.style.color = lum > 0.5 ? '#000' : '#fff';
                     document.getElementById('contrastBadge').textContent = lum > 0.5 ? 'Dark Text Better' : 'White Text Better';
 
-                    // Update Palettes
                     if(document.getElementById('p-base')) {
                         document.getElementById('p-base').style.backgroundColor = hex;
                         document.getElementById('p-comp').style.backgroundColor = `hsl(${(hsl.h + 180)%360}, ${hsl.s}%, ${hsl.l}%)`;
                     }
 
-                    // Update Lips
+                    // BEAUTY VIEW
                     document.querySelectorAll('.makeup-mask path').forEach(p => p.setAttribute('fill', hex));
+
+                    // FETCH NAME (NEW)
+                    fetchColorName(hex);
                 });
             }
 
-            // Sliders
+            // UTILS
             const maskEl = document.getElementById('makeupMask');
             document.getElementById('opacitySlider').addEventListener('input', function() { maskEl.style.opacity = this.value; });
             document.getElementById('blurSlider').addEventListener('input', function() { maskEl.style.filter = `blur(${this.value}px)`; });
 
-            // Image Pickers
             document.getElementById('beautyUpload').addEventListener('change', function(e) {
                 if(e.target.files[0]) document.getElementById('faceImage').src = URL.createObjectURL(e.target.files[0]);
             });
@@ -305,6 +291,21 @@
                 const hex = "#" + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
                 if(colorPicker) colorPicker.color.hexString = hex;
             });
+
+            // Name Fetch Function
+            let timeout;
+            function fetchColorName(hex) {
+                clearTimeout(timeout);
+                const nameEl = document.getElementById('colorNameWeb');
+                if(nameEl) nameEl.textContent = "...";
+                timeout = setTimeout(async()=>{
+                    try {
+                        const res = await fetch(`https://www.thecolorapi.com/id?hex=${hex.substring(1)}`);
+                        const data = await res.json();
+                        if(nameEl) nameEl.textContent = data.name.value;
+                    } catch(e) {}
+                }, 500);
+            }
 
             window.copyText = function(id) {
                 navigator.clipboard.writeText(document.getElementById(id).innerText);
