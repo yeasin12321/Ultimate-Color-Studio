@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <meta name="author" content="Yeasin Kabir">
+    <meta name="description" content="Ultimate Color Studio Suite developed by Yeasin Kabir.">
+    
+    <title>Ultimate Color Studio by Yeasin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+
+    <style>
+        /* --- CSS Variables & Reset --- */
+        :root {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --accent-color: #3b82f6; /* ডায়নামিক কালার */
+            --contrast-text: #ffffff; /* ডায়নামিক টেক্সট কালার */
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            padding: 30px;
+            padding-bottom: 80px;
+            min-height: 100vh;
+        }
+
+        /* --- Layout --- */
+        .main-dashboard {
+            display: grid;
+            grid-template-columns: 320px 1fr 300px; /* ৩ কলামের লেআউট */
+            gap: 25px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* --- Common Styles --- */
+        .card {
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+            margin-bottom: 25px;
+        }
+
+        h2, h3 {
+            font-size: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn {
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+            font-family: inherit;
+        }
+        .btn-primary {
+            background: var(--accent-color);
+            color: var(--contrast-text);
+        }
+        .btn-primary:hover { opacity: 0.9; transform: translateY(-2px); }
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+        .btn-icon { padding: 10px; border-radius: 50%; background: rgba(255,255,255,0.1); color: white; }
+
+        /* --- COLUMN 1: The Lab (Inputs) --- */
+        .main-picker-wrapper {
+            position: relative;
+            width: 180px; height: 180px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            border: 6px solid rgba(255,255,255,0.1);
+            box-shadow: 0 0 40px var(--accent-color);
+            transition: box-shadow 0.3s;
+        }
+        input[type="color"].main-input {
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200%; height: 200%;
+            opacity: 0; cursor: pointer;
+        }
+        .hex-title { font-size: 32px; font-weight: 700; text-align: center; letter-spacing: 1px; }
+        .color-name { text-align: center; color: var(--text-secondary); margin-bottom: 30px; font-style: italic; }
+        
+        .action-buttons { display: flex; justify-content: center; gap: 15px; margin-bottom: 30px; }
+        
+        .contrast-checker {
+            background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; text-align: center;
+        }
+        .contrast-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-top: 5px;
+        }
+        .pass { background: #22c55e; color: white; } .fail { background: #ef4444; color: white; }
+
+        /* --- COLUMN 2: The Studio (Visuals) --- */
+        .gradient-preview {
+            height: 150px; border-radius: 12px; margin-bottom: 20px;
+        }
+        .gradient-inputs { display: flex; gap: 15px; justify-content: center; margin-bottom: 20px; }
+        .mini-picker {
+             width: 40px; height: 40px; border-radius: 50%; border: 3px solid rgba(255,255,255,0.2); overflow: hidden; cursor: pointer;
+        }
+        .mini-picker input { opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+
+        /* UI Preview Section */
+        .ui-preview-box {
+            background: #f0f2f5; /* Light background for contrast */
+            padding: 30px;
+            border-radius: 12px;
+            color: #1e293b;
+        }
+        .dummy-card {
+            background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        .dummy-btn {
+            background: var(--accent-color);
+            color: var(--contrast-text);
+            border: none; padding: 10px 20px; border-radius: 6px; font-weight: 600; cursor: default;
+        }
+
+        /* --- COLUMN 3: The Library (Palettes) --- */
+        .palette-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 8px;
+        }
+        .color-box {
+            height: 50px; border-radius: 8px; cursor: pointer; transition: transform 0.2s; position: relative;
+        }
+        .color-box:hover { transform: scale(1.15); z-index: 2; }
+        /* Tooltip */
+        .color-box::after {
+            content: attr(data-hex); position: absolute; bottom: -25px; left: 50%; transform: translateX(-50%);
+            background: #000; color: #fff; padding: 4px 8px; font-size: 10px; border-radius: 4px;
+            opacity: 0; pointer-events: none; white-space: nowrap; transition: opacity 0.2s;
+        }
+        .color-box:hover::after { opacity: 1; }
+
+        .saved-palettes-list { display: flex; flex-direction: column; gap: 15px; }
+        .saved-item { background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px; display: flex; gap: 5px; }
+        .saved-item .mini-box { width: 30px; height: 30px; border-radius: 4px; }
+
+        /* --- Footer & Toast --- */
+        .dev-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px);
+            padding: 15px; text-align: center; border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 14px; color: var(--text-secondary); z-index: 100;
+        }
+        .dev-link { color: var(--accent-color); text-decoration: none; font-weight: 600; }
+
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: #333; color: #fff;
+            text-align: center; border-radius: 8px; padding: 16px; position: fixed;
+            z-index: 1000; bottom: 90px; left: 50%; transform: translateX(-50%);
+        }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 60px; opacity: 0;} to {bottom: 90px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 90px; opacity: 1;} to {bottom: 60px; opacity: 0;} }
+
+        @media (max-width: 1024px) { .main-dashboard { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <div class="main-dashboard">
+        <div class="col-lab">
+            <div class="card" style="text-align: center;">
+                <h2 style="justify-content: center;"><span class="material-icons-round">science</span>Color Lab</h2>
+                
+                <div class="main-picker-wrapper" id="mainPreviewCircle">
+                    <input type="color" class="main-input" id="mainColorInput" value="#3b82f6">
+                </div>
+                
+                <div class="hex-title" id="hexDisplay">#3B82F6</div>
+                <div class="color-name" id="nameDisplay">Loading...</div>
+
+                <div class="action-buttons">
+                    <button class="btn btn-icon" id="btnRandom" title="Random Color (Spacebar)">
+                        <span class="material-icons-round">shuffle</span>
+                    </button>
+                    <button class="btn btn-icon" id="btnEyeDropper" title="Pick from Screen">
+                        <span class="material-icons-round">colorize</span>
+                    </button>
+                </div>
+
+                 <div class="contrast-checker">
+                    <small>CONTRAST CHECK</small>
+                    <div style="margin: 10px 0; font-weight: bold; color: var(--contrast-text); background: var(--accent-color); padding: 5px; border-radius: 4px;">
+                        Text Readability
+                    </div>
+                    <span id="contrastBadge" class="contrast-badge pass">Good</span>
+                </div>
+            </div>
+
+            <div class="card">
+                 <h3><span class="material-icons-round">code</span>Values</h3>
+                 <div id="rgbDisplay" style="font-family: monospace; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; margin-bottom: 10px; cursor: pointer;" onclick="copyText(this.innerText)">rgb(59, 130, 246)</div>
+                 <div id="hslDisplay" style="font-family: monospace; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px; cursor: pointer;" onclick="copyText(this.innerText)">hsl(217, 91%, 60%)</div>
+            </div>
+        </div>
+
+        <div class="col-studio">
+             <div class="card">
+                <h3><span class="material-icons-round">gradient</span>Gradient Maker</h3>
+                <div class="gradient-preview" id="gradientPreview" style="background: linear-gradient(to right, #3b82f6, #8b5cf6);"></div>
+                <div class="gradient-inputs">
+                    <div class="mini-picker" style="background-color: #3b82f6;"><input type="color" id="gradInput1" value="#3b82f6"></div>
+                    <div class="mini-picker" style="background-color: #8b5cf6;"><input type="color" id="gradInput2" value="#8b5cf6"></div>
+                </div>
+                <button class="btn btn-outline" style="width: 100%;" onclick="copyGradientCSS()">
+                    <span class="material-icons-round">content_copy</span> Copy CSS
+                </button>
+            </div>
+
+            <div class="card">
+                <h3><span class="material-icons-round">preview</span>Live UI Preview</h3>
+                <div class="ui-preview-box">
+                    <div class="dummy-card">
+                        <h4 style="color: var(--accent-color); margin-bottom: 10px;">Card Title</h4>
+                        <p style="margin-bottom: 15px; color: #64748b;">This is how your selected color looks on common UI elements.</p>
+                        <button class="dummy-btn">Primary Button</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-library">
+             <div class="card">
+                <h3><span class="material-icons-round">palette</span>Shades & Tints</h3>
+                <div class="palette-grid" id="shadesContainer"></div>
+            </div>
+
+            <div class="card">
+                <h3><span class="material-icons-round">group_work</span>Harmony</h3>
+                <small style="display:block; margin-bottom: 5px; color: var(--text-secondary);">COMPLEMENTARY</small>
+                <div class="palette-grid" id="compContainer" style="margin-bottom: 15px;"></div>
+                <small style="display:block; margin-bottom: 5px; color: var(--text-secondary);">TRIADIC</small>
+                <div class="palette-grid" id="triadContainer"></div>
+            </div>
+
+             <div class="card">
+                <h3><span class="material-icons-round">bookmarks</span>Saved Palettes</h3>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="saveCurrentPalette()">
+                    <span class="material-icons-round">save</span> Save Current Palette
+                </button>
+                <div class="saved-palettes-list" id="savedContainer">
+                    <small>No saved palettes yet.</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast">Copied!</div>
+    <footer class="dev-footer">
+        <p>Developed by <a href="#" class="dev-link">Yeasin Kabir</a> | &copy; <span id="year"></span> All Rights Reserved</p>
+    </footer>
+
+    <script>
+        // --- Signature ---
+        console.log("%c Ultimate Color Studio by Yeasin Kabir ", "background: #3b82f6; color: white; padding: 8px; border-radius: 4px; font-weight: bold;");
+
+        // --- DOM Elements ---
+        const mainColorInput = document.getElementById('mainColorInput');
+        const root = document.documentElement;
+        const hexDisplay = document.getElementById('hexDisplay');
+        const rgbDisplay = document.getElementById('rgbDisplay');
+        const hslDisplay = document.getElementById('hslDisplay');
+        const nameDisplay = document.getElementById('nameDisplay');
+        const contrastBadge = document.getElementById('contrastBadge');
+        const gradInput1 = document.getElementById('gradInput1');
+        const gradInput2 = document.getElementById('gradInput2');
+        let currentHarmonyColors = [];
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        // --- Event Listeners ---
+        mainColorInput.addEventListener('input', (e) => updateUI(e.target.value));
+        mainColorInput.addEventListener('change', (e) => fetchColorName(e.target.value));
+        
+        gradInput1.addEventListener('input', updateGradient);
+        gradInput2.addEventListener('input', updateGradient);
+        
+        document.getElementById('btnRandom').addEventListener('click', generateRandomColor);
+        document.addEventListener('keydown', (e) => { if(e.code === 'Space') { e.preventDefault(); generateRandomColor(); }});
+
+        // EyeDropper API Support Check
+        if (!window.EyeDropper) { document.getElementById('btnEyeDropper').style.display = 'none'; }
+        document.getElementById('btnEyeDropper').addEventListener('click', async () => {
+            try {
+                const eyeDropper = new EyeDropper();
+                const result = await eyeDropper.open();
+                updateUI(result.sRGBHex);
+                fetchColorName(result.sRGBHex);
+            } catch (e) { console.log('EyeDropper closed'); }
+        });
+
+        // ================= CORE FUNCTIONS =================
+
+        // Main Update Function - The brain of the operation
+        function updateUI(hex) {
+            hex = hex.toUpperCase();
+            mainColorInput.value = hex;
+            hexDisplay.innerText = hex;
+            
+            // Update CSS Variables for Dynamic Theme & UI Preview
+            root.style.setProperty('--accent-color', hex);
+            document.getElementById('mainPreviewCircle').style.boxShadow = `0 0 40px ${hex}`;
+            gradInput1.parentElement.style.backgroundColor = hex;
+
+            // Conversions
+            const rgb = hexToRgb(hex);
+            const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+            rgbDisplay.innerText = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+            hslDisplay.innerText = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+            // Features Check
+            checkContrast(rgb.r, rgb.g, rgb.b);
+            generateShades(hex);
+            generateHarmony(hsl.h, hsl.s, hsl.l);
+            
+            // Sync Gradient Input 1 with main color initially
+            if(gradInput1.value !== hex) { gradInput1.value = hex; updateGradient(); }
+        }
+
+        // Random Color Generator
+        function generateRandomColor() {
+            const randomHex = '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0');
+            updateUI(randomHex);
+            fetchColorName(randomHex);
+        }
+
+        // Contrast Checker (YIQ formula)
+        function checkContrast(r, g, b) {
+            const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+            const isDark = yiq < 128;
+            root.style.setProperty('--contrast-text', isDark ? '#ffffff' : '#0f172a');
+            contrastBadge.innerText = isDark ? 'Good with White Text' : 'Good with Black Text';
+            contrastBadge.className = 'contrast-badge ' + (isDark ? 'pass' : 'pass'); // Using pass for both, just changing text context
+        }
+
+        // Gradient Updater
+        function updateGradient() {
+            const c1 = gradInput1.value;
+            const c2 = gradInput2.value;
+            gradInput1.parentElement.style.backgroundColor = c1;
+            gradInput2.parentElement.style.backgroundColor = c2;
+            document.getElementById('gradientPreview').style.background = `linear-gradient(to right, ${c1}, ${c2})`;
+        }
+
+        // ================= GENERATORS (Shades & Harmony) =================
+        function generateShades(hex) {
+            const container = document.getElementById('shadesContainer');
+            container.innerHTML = '';
+            for (let i = -4; i <= 4; i++) {
+                createColorBox(container, lightenDarkenColor(hex, i * 20));
+            }
+        }
+
+        function generateHarmony(h, s, l) {
+            const compContainer = document.getElementById('compContainer');
+            const triadContainer = document.getElementById('triadContainer');
+            compContainer.innerHTML = ''; triadContainer.innerHTML = '';
+            
+            currentHarmonyColors = []; // Reset for saving
+
+            // Complementary
+            const c1 = hslToHex(h, s, l); const c2 = hslToHex((h + 180) % 360, s, l);
+            createColorBox(compContainer, c1); createColorBox(compContainer, c2);
+            currentHarmonyColors.push(c1, c2);
+
+            // Triadic
+            const t1 = hslToHex(h, s, l); const t2 = hslToHex((h + 120) % 360, s, l); const t3 = hslToHex((h + 240) % 360, s, l);
+            createColorBox(triadContainer, t1); createColorBox(triadContainer, t2); createColorBox(triadContainer, t3);
+             currentHarmonyColors.push(t2, t3); // Adding unique triad colors
+        }
+
+        function createColorBox(container, hex) {
+            const div = document.createElement('div');
+            div.className = 'color-box';
+            div.style.backgroundColor = hex;
+            div.setAttribute('data-hex', hex);
+            div.onclick = () => copyText(hex);
+            container.appendChild(div);
+        }
+
+        // ================= LOCAL STORAGE (Saved Palettes) =================
+        function saveCurrentPalette() {
+            const palette = {
+                main: hexDisplay.innerText,
+                colors: [...new Set(currentHarmonyColors)], // Use Set to avoid duplicates
+                date: new Date().toLocaleDateString()
+            };
+            let saved = JSON.parse(localStorage.getItem('yeasinPalettes')) || [];
+            saved.unshift(palette);
+            localStorage.setItem('yeasinPalettes', JSON.stringify(saved));
+            loadSavedPalettes();
+            showToast('Palette Saved Successfully!');
+        }
+
+        function loadSavedPalettes() {
+            const container = document.getElementById('savedContainer');
+            const saved = JSON.parse(localStorage.getItem('yeasinPalettes')) || [];
+            container.innerHTML = saved.length ? '' : '<small>No saved palettes yet.</small>';
+            
+            saved.slice(0, 5).forEach(p => { // Show last 5
+                const item = document.createElement('div');
+                item.className = 'saved-item';
+                item.innerHTML = `<div class="mini-box" style="background:${p.main}; cursor:pointer;" onclick="updateUI('${p.main}');fetchColorName('${p.main}')" title="Load this color"></div>`;
+                p.colors.forEach(c => {
+                    item.innerHTML += `<div class="mini-box" style="background:${c}" title="${c}"></div>`;
+                });
+                container.appendChild(item);
+            });
+        }
+
+        // ================= HELPERS & APIs =================
+        async function fetchColorName(hex) {
+            nameDisplay.innerText = "Finding name...";
+            try {
+                const res = await fetch(`https://www.thecolorapi.com/id?hex=${hex.substring(1)}`);
+                const data = await res.json();
+                nameDisplay.innerText = data.name.value;
+            } catch (e) { nameDisplay.innerText = "Unknown Color"; }
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text);
+            showToast(`Copied: ${text}`);
+        }
+        function copyGradientCSS() {
+            copyText(`background: linear-gradient(to right, ${gradInput1.value}, ${gradInput2.value});`);
+        }
+        function showToast(msg) {
+            const x = document.getElementById("toast"); x.innerText = msg; x.className = "show";
+            setTimeout(() => x.className = x.className.replace("show", ""), 3000);
+        }
+
+        // --- Math & Conversion (Shortened for brevity but functional) ---
+        function hexToRgb(h){const i=parseInt(h.slice(1),16);return{r:(i>>16)&255,g:(i>>8)&255,b:i&255}}
+        function rgbToHsl(r,g,b){r/=255,g/=255,b/=255;const max=Math.max(r,g,b),min=Math.min(r,g,b);let h,s,l=(max+min)/2;if(max===min)h=s=0;else{const d=max-min;s=l>.5?d/(2-max-min):d/(max+min);switch(max){case r:h=(g-b)/d+(g<b?6:0);break;case g:h=(b-r)/d+2;break;case b:h=(r-g)/d+4}h/=6}return{h:Math.round(h*360),s:Math.round(s*100),l:Math.round(l*100)}}
+        function hslToHex(h,s,l){l/=100;const a=s*Math.min(l,1-l)/100,f=n=>{const k=(n+h/30)%12,c=l-a*Math.max(Math.min(k-3,9-k,1),-1);return Math.round(255*c).toString(16).padStart(2,"0")};return`#${f(0)}${f(8)}${f(4)}`}
+        function lightenDarkenColor(c,a){let u=!1;c[0]=="#"&&(c=c.slice(1),u=!0);let n=parseInt(c,16),r=(n>>16)+a;r>255?r=255:r<0&&(r=0);let b=((n>>8)&255)+a;b>255?b=255:b<0&&(b=0);let g=(n&255)+a;g>255?g=255:g<0&&(g=0);return(u?"#":"")+(g|(b<<8)|(r<<16)).toString(16).padStart(6,"0")}
+
+        // Init
+        updateUI('#3b82f6');
+        fetchColorName('#3b82f6');
+        loadSavedPalettes();
+    </script>
+</body>
+</html>
