@@ -119,8 +119,8 @@
         .upload-area { border: 2px dashed #334155; padding: 20px; text-align: center; border-radius: 8px; cursor: pointer; color: #64748b; font-size: 12px; }
 
         /* --- SHARED WHEEL --- */
-        .wheel-container { background: var(--card-bg); padding: 15px; border-radius: 20px; text-align: center; margin-top: auto; border: 1px solid #334155; }
-        #picker { display: flex; justify-content: center; }
+        .wheel-container { background: var(--card-bg); padding: 15px; border-radius: 20px; text-align: center; margin-top: auto; border: 1px solid #334155; min-height: 250px; display: flex; align-items: center; justify-content: center; }
+        #picker { display: block; }
 
         footer { text-align: center; font-size: 10px; color: #475569; margin-top: 20px; }
     </style>
@@ -378,4 +378,53 @@
                     const img = new Image();
                     img.onload = function() {
                         canvas.style.display = 'block';
-                        document.getElementById('uploadText').style.display = 'none'
+                        document.getElementById('uploadText').style.display = 'none';
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+                    }
+                    img.src = URL.createObjectURL(e.target.files[0]);
+                }
+            });
+
+            canvas.addEventListener('click', function(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                const p = ctx.getImageData(x, y, 1, 1).data;
+                const hex = "#" + ((1 << 24) + (p[0] << 16) + (p[1] << 8) + p[2]).toString(16).slice(1);
+                if(colorPicker) colorPicker.color.hexString = hex;
+            });
+
+            // Beauty Upload
+            document.getElementById('beautyUpload').addEventListener('change', function(e) {
+                if(e.target.files[0]) {
+                    document.getElementById('faceImage').src = URL.createObjectURL(e.target.files[0]);
+                }
+            });
+
+            // Name API
+            let timeout;
+            function fetchColorName(hex) {
+                clearTimeout(timeout);
+                const nameEl = document.getElementById('colorNameWeb');
+                if(nameEl) nameEl.textContent = "...";
+                timeout = setTimeout(async()=>{
+                    try {
+                        const res = await fetch(`https://www.thecolorapi.com/id?hex=${hex.substring(1)}`);
+                        const data = await res.json();
+                        if(nameEl) nameEl.textContent = data.name.value;
+                    } catch(e) {}
+                }, 500);
+            }
+
+            window.copyText = function(id) {
+                navigator.clipboard.writeText(document.getElementById(id).innerText);
+                alert("Copied!");
+            }
+        });
+    </script>
+</body>
+</html>
