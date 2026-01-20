@@ -25,7 +25,7 @@
             overflow: hidden; /* Intro চলাকালীন স্ক্রল বন্ধ */
         }
 
-        /* --- INTRO ANIMATION STYLES (UPDATED) --- */
+        /* --- INTRO ANIMATION --- */
         #intro-overlay {
             position: fixed;
             top: 0;
@@ -51,6 +51,7 @@
             color: transparent;
             margin-bottom: 10px;
             animation: fadeIn 1s ease forwards;
+            text-align: center;
         }
 
         .intro-sub {
@@ -106,28 +107,31 @@
         .card { background-color: var(--card-bg); border: 1px solid #334155; border-radius: 16px; padding: 15px; margin-bottom: 12px; }
         .card-title { font-size: 11px; color: #64748b; margin-bottom: 10px; font-weight: bold; text-transform: uppercase; }
 
-        .makeup-area { position: relative; width: 100%; height: 260px; border-radius: 16px; overflow: hidden; border: 2px solid #333; background-color: var(--skin-tone); }
+        .makeup-area { position: relative; width: 100%; height: 260px; border-radius: 16px; overflow: hidden; border: 2px solid #333; background-color: var(--skin-tone); background-image: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.2) 100%); }
         .face-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; }
         .makeup-mask { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; height: 100%; mix-blend-mode: multiply; opacity: 0.6; filter: blur(4px); pointer-events: none; transition: fill 0.2s; }
 
-        /* Grid */
+        /* Grid for Trending Shades */
         .shade-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 5px; }
-        .shade-btn { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; }
-        
-        /* Others */
+        .shade-btn { width: 100%; aspect-ratio: 1; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; transition: transform 0.2s; }
+        .shade-btn:hover { transform: scale(1.1); border-color: #fff; }
+
+        /* Sliders */
         .sliders { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
         .slider-group { display: flex; justify-content: space-between; font-size: 10px; color: #aaa; }
         input[type=range] { width: 60%; accent-color: var(--accent); }
         
-        .contrast-box { padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 10px; }
-        .value-row { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #ccc; margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #334155; }
+        .contrast-box { padding: 15px; border-radius: 8px; text-align: center; margin-bottom: 10px; font-weight: 600; }
+        .value-row { background: #0f172a; padding: 12px; border-radius: 6px; font-family: monospace; font-size: 13px; color: #ccc; margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #334155; cursor: pointer;}
         .palette-row { display: flex; height: 35px; border-radius: 6px; overflow: hidden; margin-top: 5px; }
         .p-box { flex: 1; transition: background 0.3s; }
+        .gradient-preview { height: 60px; border-radius: 8px; margin-top: 5px; display: flex; align-items: center; justify-content: center; font-size: 10px; color: rgba(255,255,255,0.8); }
 
-        .wheel-container { background: var(--card-bg); padding: 20px; border-radius: 20px; text-align: center; margin-top: auto; border: 1px solid #334155; display: flex; justify-content: center; }
+        .wheel-container { background: var(--card-bg); padding: 20px; border-radius: 20px; text-align: center; margin-top: auto; border: 1px solid #334155; display: flex; justify-content: center; min-height: 280px; align-items: center; }
+        #picker { display: block; }
         
         /* Image Picker */
-        #imageCanvas { width: 100%; display: none; margin-top: 10px; border-radius: 8px; }
+        #imageCanvas { width: 100%; display: none; margin-top: 10px; border-radius: 8px; border: 1px solid #334155;}
         .upload-area { border: 2px dashed #444; padding: 20px; text-align: center; font-size: 12px; color: #888; border-radius: 8px; }
 
         footer { text-align: center; font-size: 10px; color: #475569; margin-top: 20px; }
@@ -169,6 +173,10 @@
                         <div id="p-comp" class="p-box" style="background:#f6b95c"></div>
                     </div>
                 </div>
+                <div class="card">
+                    <div class="card-title">CSS Gradient</div>
+                    <div id="gradientBox" class="gradient-preview">background: linear-gradient(...)</div>
+                </div>
             </div>
 
             <div id="beauty-view" class="view-section">
@@ -179,8 +187,9 @@
                         <path d="M25,65 C60,80 100,85 100,85 C100,85 140,80 175,65 C160,110 100,115 100,115 C100,115 40,110 25,65 Z" fill="#8b5cf6" />
                     </svg>
                 </div>
+
                 <div class="card">
-                    <div class="card-title">🔥 Trending Shades</div>
+                    <div class="card-title">🔥 Trending Shades (Click to Try)</div>
                     <div class="shade-grid">
                         <div class="shade-btn" style="background:#b38b6d" onclick="setShade('#b38b6d')"></div>
                         <div class="shade-btn" style="background:#9e5e50" onclick="setShade('#9e5e50')"></div>
@@ -188,8 +197,15 @@
                         <div class="shade-btn" style="background:#be002f" onclick="setShade('#be002f')"></div>
                         <div class="shade-btn" style="background:#a62c2b" onclick="setShade('#a62c2b')"></div>
                         <div class="shade-btn" style="background:#ec4899" onclick="setShade('#ec4899')"></div>
+                        <div class="shade-btn" style="background:#6d28d9" onclick="setShade('#6d28d9')"></div>
+                        <div class="shade-btn" style="background:#4c1d1d" onclick="setShade('#4c1d1d')"></div>
+                        <div class="shade-btn" style="background:#f43f5e" onclick="setShade('#f43f5e')"></div>
+                        <div class="shade-btn" style="background:#d946ef" onclick="setShade('#d946ef')"></div>
+                        <div class="shade-btn" style="background:#fb923c" onclick="setShade('#fb923c')"></div>
+                        <div class="shade-btn" style="background:#3f1825" onclick="setShade('#3f1825')"></div>
                     </div>
                 </div>
+
                 <div class="card">
                     <div class="card-title">Adjustments</div>
                     <div class="sliders">
@@ -232,9 +248,7 @@
                 dashboard.style.opacity = '1';
                 body.style.overflow = 'auto';
             };
-
-            // Auto close after 2.5s
-            setTimeout(window.closeIntro, 2500);
+            setTimeout(window.closeIntro, 3000); // 3 seconds auto close
 
             // SETUP COLOR PICKER
             let colorPicker;
@@ -265,11 +279,12 @@
                     const hex = color.hexString;
                     const hsl = color.hsl;
 
-                    // WEB
+                    // WEB VIEW
                     document.getElementById('hexValue').textContent = hex;
                     document.getElementById('rgbValue').textContent = color.rgbString;
-                    const cBox = document.getElementById('contrastBox');
+                    
                     const lum = (0.299 * color.rgb.r + 0.587 * color.rgb.g + 0.114 * color.rgb.b) / 255;
+                    const cBox = document.getElementById('contrastBox');
                     cBox.style.backgroundColor = hex;
                     cBox.style.color = lum > 0.5 ? '#000' : '#fff';
                     document.getElementById('contrastBadge').textContent = lum > 0.5 ? 'Dark Text Better' : 'White Text Better';
@@ -278,10 +293,15 @@
                         document.getElementById('p-base').style.backgroundColor = hex;
                         document.getElementById('p-comp').style.backgroundColor = `hsl(${(hsl.h + 180)%360}, ${hsl.s}%, ${hsl.l}%)`;
                     }
+                    // Gradient
+                    const gColor2 = `hsl(${(hsl.h + 30)%360}, ${hsl.s}%, ${Math.max(0, hsl.l - 20)}%)`;
+                    document.getElementById('gradientBox').style.background = `linear-gradient(135deg, ${hex}, ${gColor2})`;
+                    document.getElementById('gradientBox').textContent = `background: linear-gradient(135deg, ${hex}, ${gColor2})`;
 
-                    // BEAUTY
+                    // BEAUTY VIEW
                     document.querySelectorAll('.makeup-mask path').forEach(p => p.setAttribute('fill', hex));
 
+                    // FETCH NAME
                     fetchColorName(hex);
                 });
             }
